@@ -9,7 +9,7 @@ apt update -y && apt install -y git curl wget jq bash-completion
 
 # Clone ou update
 if [ ! -d "$REPO_DIR/.git" ]; then
-    git clone https://github.com/ton-repo/Projet_VPS.git "$REPO_DIR"
+    git clone https://github.com/xcybermanx/Projet_VPS.git "$REPO_DIR"
 else
     cd "$REPO_DIR"
     git pull
@@ -29,3 +29,4 @@ chmod +x "$REPO_DIR/menu/menu.sh"
 
 echo "Installation terminée !"
 echo "Lancer le menu : projet-menu"
+
