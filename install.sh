@@ -24,9 +24,10 @@ if [ ! -f "$TOKEN_FILE" ]; then
 fi
 
 # Lien pour menu
-ln -sf "$REPO_DIR/menu/menu.sh" /usr/local/bin/projet-menu
+ln -sf "$REPO_DIR/menu/menu.sh" /usr/local/bin/menu
 chmod +x "$REPO_DIR/menu/menu.sh"
 
 echo "Installation terminée !"
-echo "Lancer le menu : projet-menu"
+echo "Lancer le menu : menu"
+
 
