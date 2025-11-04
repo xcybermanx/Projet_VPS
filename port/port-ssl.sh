@@ -50,6 +50,6 @@ exit
 menu
 ;;
 *)
-echo "Anda salah tekan"
+echo "You pressed the wrong button"
 ;;
 esac
