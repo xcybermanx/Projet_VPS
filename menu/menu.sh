@@ -1,290 +1,244 @@
-BURIQ () {
-curl -sS https://raw.githubusercontent.com/FasterExE/permission/main/register > /root/tmp
-data=( `cat /root/tmp | grep -E "^### " | awk '{print $2}'` )
-for user in "${data[@]}"
-do
-exp=( `grep -E "^### $user" "/root/tmp" | awk '{print $3}'` )
-d1=(`date -d "$exp" +%s`)
-d2=(`date -d "$biji" +%s`)
-exp2=$(( (d1 - d2) / 86400 ))
-if [[ "$exp2" -le "0" ]]; then
-echo $user > /etc/.$user.ini
-else
-rm -f /etc/.$user.ini > /dev/null 2>&1
-fi
-done
-rm -f /root/tmp
+#!/usr/bin/env bash
+# menu.sh - Version modernisée pour xcybermanx/Projet_VPS
+# Auteur: xcybermanx (adapté)
+# Usage: sudo bash menu.sh
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+##### Config - À personnaliser #####
+GIT_USER="xcybermanx"
+REPO="Projet_VPS"
+REGISTER_PATH="register"   # chemin relatif dans le repo
+RAW_BASE="https://raw.githubusercontent.com/$GIT_USER/$REPO/main"
+REGISTER_URL="$RAW_BASE/$REGISTER_PATH"
+LOGFILE="/var/log/projet_vps_menu.log"
+VERSION_FILE="/opt/.ver"   # à créer/pousser dans repo si tu veux indiquer version
+###################################
+
+# Couleurs
+RED="\033[0;31m"; GREEN="\033[0;32m"; YELLOW="\033[0;33m"; CYAN="\033[0;36m"; NC="\033[0m"
+
+log() { echo -e "[$(date '+%F %T')] $*" | tee -a "$LOGFILE"; }
+
+# Récupère la date serveur (fallback à local si échec)
+get_server_date() {
+  local ds
+  ds=$(curl -sI --max-time 5 https://google.com/ 2>/dev/null | grep -i '^Date:' || true)
+  if [ -n "$ds" ]; then
+    date -d "${ds#Date: }" +%F 2>/dev/null || date +%F
+  else
+    date +%F
+  fi
 }
-MYIP=$(curl -sS ipv4.icanhazip.com)
-Name=$(curl -sS https://raw.githubusercontent.com/FasterExE/permission/main/register | grep $MYIP | awk '{print $2}')
-echo $Name > /usr/local/etc/.$Name.ini
-CekOne=$(cat /usr/local/etc/.$Name.ini)
-Bloman () {
-if [ -f "/etc/.$Name.ini" ]; then
-CekTwo=$(cat /etc/.$Name.ini)
-if [ "$CekOne" = "$CekTwo" ]; then
-res="Expired"
-fi
-else
-clear
-fi
+
+# Télécharge le fichier register localement et renvoie le path
+fetch_register() {
+  local out="/tmp/projet_register.$$"
+  if curl -fsSL "$REGISTER_URL" -o "$out"; then
+    echo "$out"
+  else
+    log "${RED}Erreur: impossible de télécharger $REGISTER_URL${NC}"
+    return 1
+  fi
 }
-PERMISSION () {
-MYIP=$(curl -sS ipv4.icanhazip.com)
-IZIN=$(curl -sS https://raw.githubusercontent.com/FasterExE/permission/main/register | awk '{print $4}' | grep $MYIP)
-if [ "$MYIP" = "$IZIN" ]; then
-Bloman
-else
-clear
-fi
-BURIQ
+
+# Parse register line format:
+# ### name YYYY-MM-DD IP [TOKEN]
+# Retourne lignes valides (name|date|ip|token)
+parse_register() {
+  local file="$1"
+  awk '/^### / { $1=""; sub(/^ +/,""); print }' "$file" | while read -r line; do
+    # split into fields
+    name=$(echo "$line" | awk '{print $1}')
+    date_exp=$(echo "$line" | awk '{print $2}')
+    ip=$(echo "$line" | awk '{print $3}')
+    token=$(echo "$line" | awk '{print $4}')
+    echo "$name|$date_exp|$ip|$token"
+  done
 }
-red='\e[1;31m'
-green='\e[1;32m'
-NC='\e[0m'
-green() { echo -e "\\033[32;1m${*}\\033[0m"; }
-red() { echo -e "\\033[31;1m${*}\\033[0m"; }
-PERMISSION
-if [ "$res" = "Expired" ]; then
-Exp="\e[36mExpired\033[0m"
-else
-Exp=$(curl -sS https://raw.githubusercontent.com/FasterExE/permission/main/register | grep $MYIP | awk '{print $3}')
-fi
-vlx=$(grep -c -E "#& " "/etc/xray/config.json")
-let vla=$vlx/2
-vmc=$(grep -c -E "^### " "/etc/xray/config.json")
-let vma=$vmc/2
-ssh1="$(awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd | wc -l)"
-trx=$(grep -c -E "^#! " "/etc/xray/config.json")
-let tra=$trx/2
-ssx=$(grep -c -E "^## " "/etc/xray/config.json")
-let ssa=$ssx/2
-BIBlack='\033[1;90m'      # Black
-BIRed='\033[1;91m'        # Red
-BIGreen='\033[1;92m'      # Green
-BIYellow='\033[1;93m'     # Yellow
-BIBlue='\033[1;94m'       # Blue
-BIPurple='\033[1;95m'     # Purple
-BICyan='\033[1;96m'       # Cyan
-BIWhite='\033[1;97m'      # White
-UWhite='\033[4;37m'       # White
-On_IPurple='\033[0;105m'  #
-On_IRed='\033[0;101m'
-IBlack='\033[0;90m'       # Black
-IRed='\033[0;91m'         # Red
-IGreen='\033[0;92m'       # Green
-IYellow='\033[0;93m'      # Yellow
-IBlue='\033[0;94m'        # Blue
-IPurple='\033[0;95m'      # Purple
-ICyan='\033[0;96m'        # Cyan
-IWhite='\033[0;97m'       # White
-NC='\e[0m'
-dtoday="$(vnstat -i eth0 | grep "today" | awk '{print $2" "substr ($3, 1, 1)}')"
-utoday="$(vnstat -i eth0 | grep "today" | awk '{print $5" "substr ($6, 1, 1)}')"
-ttoday="$(vnstat -i eth0 | grep "today" | awk '{print $8" "substr ($9, 1, 1)}')"
-dyest="$(vnstat -i eth0 | grep "yesterday" | awk '{print $2" "substr ($3, 1, 1)}')"
-uyest="$(vnstat -i eth0 | grep "yesterday" | awk '{print $5" "substr ($6, 1, 1)}')"
-tyest="$(vnstat -i eth0 | grep "yesterday" | awk '{print $8" "substr ($9, 1, 1)}')"
-dmon="$(vnstat -i eth0 -m | grep "`date +"%b '%y"`" | awk '{print $3" "substr ($4, 1, 1)}')"
-umon="$(vnstat -i eth0 -m | grep "`date +"%b '%y"`" | awk '{print $6" "substr ($7, 1, 1)}')"
-tmon="$(vnstat -i eth0 -m | grep "`date +"%b '%y"`" | awk '{print $9" "substr ($10, 1, 1)}')"
-clear
-tram=$( free -h | awk 'NR==2 {print $2}' )
-uram=$( free -h | awk 'NR==2 {print $3}' )
-ISP=$(curl -s ipinfo.io/org | cut -d " " -f 2-10 )
-CITY=$(curl -s ipinfo.io/city )
-cpu_usage1="$(ps aux | awk 'BEGIN {sum=0} {sum+=$3}; END {print sum}')"
-cpu_usage="$((${cpu_usage1/\.*} / ${corediilik:-1}))"
-cpu_usage+=" %"
-total_ram=` grep "MemTotal: " /proc/meminfo | awk '{ print $2}'`
-totalram=$(($total_ram/1024))
-persenmemori="$(echo "scale=2; $usmem*100/$tomem" | bc)"
-persencpu="$(echo "scale=2; $cpu1+$cpu2" | bc)"
-export LANG='en_US.UTF-8'
-export LANGUAGE='en_US.UTF-8'
-export RED='\033[0;31m'
-export GREEN='\033[0;32m'
-export YELLOW='\033[0;33m'
-export BLUE='\033[0;34m'
-export PURPLE='\033[0;35m'
-export CYAN='\033[0;36m'
-export LIGHT='\033[0;37m'
-export NC='\033[0m'
-export EROR="[${RED} EROR ${NC}]"
-export INFO="[${YELLOW} INFO ${NC}]"
-export OKEY="[${GREEN} OKEY ${NC}]"
-export PENDING="[${YELLOW} PENDING ${NC}]"
-export SEND="[${YELLOW} SEND ${NC}]"
-export RECEIVE="[${YELLOW} RECEIVE ${NC}]"
-export BOLD="\e[1m"
-export WARNING="${RED}\e[5m"
-export UNDERLINE="\e[4m"
-clear
-clear && clear && clear
-clear;clear;clear
-cek=$(service ssh status | grep active | cut -d ' ' -f5)
-if [ "$cek" = "active" ]; then
-stat=-f5
-else
-stat=-f7
-fi
-ssh=$(service ssh status | grep active | cut -d ' ' $stat)
-if [ "$ssh" = "active" ]; then
-ressh="${green}ON${NC}"
-else
-ressh="${red}OFF${NC}"
-fi
-sshstunel=$(service stunnel4 status | grep active | cut -d ' ' $stat)
-if [ "$sshstunel" = "active" ]; then
-resst="${green}ON${NC}"
-else
-resst="${red}OFF${NC}"
-fi
-sshws=$(service ws-stunnel status | grep active | cut -d ' ' $stat)
-if [ "$sshws" = "active" ]; then
-ressshws="${green}ON${NC}"
-else
-ressshws="${red}OFF${NC}"
-fi
-ngx=$(service nginx status | grep active | cut -d ' ' $stat)
-if [ "$ngx" = "active" ]; then
-resngx="${green}ON${NC}"
-else
-resngx="${red}OFF${NC}"
-fi
-dbr=$(service dropbear status | grep active | cut -d ' ' $stat)
-if [ "$dbr" = "active" ]; then
-resdbr="${green}ON${NC}"
-else
-resdbr="${red}OFF${NC}"
-fi
-v2r=$(service xray status | grep active | cut -d ' ' $stat)
-if [ "$v2r" = "active" ]; then
-resv2r="${green}ON${NC}"
-else
-resv2r="${red}OFF${NC}"
-fi
-function addhost(){
-clear
-echo -e "${BICyan} ┌─────────────────────────────────────────────────────┐${NC}"
-echo ""
-read -rp "Domain/Host: " -e host
-echo ""
-if [ -z $host ]; then
-echo "????"
-echo -e "${BICyan} └─────────────────────────────────────────────────────┘${NC}"
-echo -e "${BICyan} ┌─────────────────────────────────────────────────────┐${NC}"
-read -n 1 -s -r -p "Press any key to back on menu"
-setting-menu
-else
-echo "IP=$host" > /var/lib/scrz-prem/ipvps.conf
-echo -e "${BICyan} └─────────────────────────────────────────────────────┘${NC}"
-echo "Dont forget to renew cert"
-echo ""
-read -n 1 -s -r -p "Press any key to back on menu"
-menu
-fi
+
+# Vérifie l'autorisation:
+# - Si register contient une ligne avec ce VPS IP + token (si token présent) -> OK
+# - Sinon fallback sur IP seul
+check_permission() {
+  local regfile="$1"
+  local today
+  today=$(get_server_date)
+  local myip
+  myip=$(curl -sS ipv4.icanhazip.com || true)
+
+  # Optional local token file: /etc/projet_vps.token
+  local local_token=""
+  if [ -f /etc/projet_vps.token ]; then
+    local_token=$(< /etc/projet_vps.token)
+  fi
+
+  local allowed=0
+  while IFS='|' read -r name exp ip token; do
+    # skip empty
+    [ -z "${name:-}" ] && continue
+    # check ip match
+    if [ "$myip" = "$ip" ]; then
+      # if token present in register, require local token match
+      if [ -n "$token" ]; then
+        if [ -n "$local_token" ] && [ "$local_token" = "$token" ]; then
+          # check expiry
+          if (date -d "$exp" +%s) -ge (date -d "$today" +%s); then
+            echo "$name|$exp|OK_TOKEN"
+            return 0
+          else
+            echo "$name|$exp|EXPIRED"
+            return 2
+          fi
+        else
+          echo "REQUIRED_TOKEN_MISMATCH"
+          return 3
+        fi
+      else
+        # no token required, check expiry by date
+        if (date -d "$exp" +%s) -ge (date -d "$today" +%s); then
+          echo "$name|$exp|OK_IP"
+          return 0
+        else
+          echo "$name|$exp|EXPIRED"
+          return 2
+        fi
+      fi
+    fi
+  done < <(parse_register "$regfile")
+
+  # no matching ip
+  return 4
 }
-function genssl(){
-clear
-systemctl stop nginx
-domain=$(cat /var/lib/scrz-prem/ipvps.conf | cut -d'=' -f2)
-Cek=$(lsof -i:80 | cut -d' ' -f1 | awk 'NR==2 {print $1}')
-if [[ ! -z "$Cek" ]]; then
-sleep 1
-echo -e "[ ${red}WARNING${NC} ] Detected port 80 used by $Cek "
-systemctl stop $Cek
-sleep 2
-echo -e "[ ${green}INFO${NC} ] Processing to stop $Cek "
-sleep 1
+
+# Affiche message permission denied
+permission_denied() {
+  clear
+  echo -e "${RED}PERMISSION DENIED${NC}"
+  echo -e "Contact admin to register your VPS."
+  echo -e "Telegram: t.me/YourContact"
+  echo -e "GitHub: https://github.com/$GIT_USER/$REPO"
+  sleep 2
+  exit 1
+}
+
+# Calcul days left
+days_left() {
+  local end="$1"
+  local today
+  today=$(get_server_date)
+  echo $(( ( $(date -d "$end" +%s) - $(date -d "$today" +%s) ) / 86400 ))
+}
+
+# Status helper for services
+check_service() {
+  local name="$1"
+  if systemctl is-active --quiet "$name"; then
+    echo -e "${GREEN}ON${NC}"
+  else
+    echo -e "${RED}OFF${NC}"
+  fi
+}
+
+# Affichage du tableau principal (menu)
+show_menu() {
+  clear
+  local name="$1"
+  local exp_date="$2"
+  local expiry_days
+  expiry_days=$(days_left "$exp_date" 2>/dev/null || echo "?")
+
+  # minimal system info
+  local ip
+  ip=$(curl -sS ipv4.icanhazip.com || echo "N/A")
+  local osname
+  osname=$(awk -F= '/PRETTY_NAME/{gsub(/"/,"",$2); print $2}' /etc/os-release 2>/dev/null || uname -srv)
+
+  # counts (safe checks)
+  local ssh_count
+  ssh_count="$(awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd 2>/dev/null | wc -l || echo 0)"
+  local v2r_count
+  v2r_count="$(grep -c -E '^### ' /etc/xray/config.json 2>/dev/null || echo 0)"
+  # show header
+  cat <<-EOF
+
+  ┌────────────────────────────────────────────┐
+  │               PROJET_VPS MENU              │
+  ├────────────────────────────────────────────┤
+  │ User: ${CYAN}$name${NC}   Expire in: ${YELLOW}$expiry_days days${NC} │
+  │ IP: ${CYAN}$ip${NC}                             OS: ${YELLOW}$osname${NC} │
+  └────────────────────────────────────────────┘
+
+  Services: SSH $(check_service ssh)  NGINX $(check_service nginx)  XRAY $(check_service xray)
+  Counts: SSH-users: ${ssh_count}  XRAY-entries: ${v2r_count}
+
+  1) SSH management
+  2) VMESS menu
+  3) VLESS menu
+  4) TROJAN menu
+  5) Settings
+  6) Trial accounts
+  7) Backup
+  8) Add Host
+  9) Running services
+  10) WS port status
+  11) Install bot
+  12) Bandwidth
+  13) Menu theme
+  14) Update script
+  0) Back to top / Exit
+
+EOF
+
+  read -rp "Select menu: " opt
+  case "$opt" in
+    1) menu-ssh ;;
+    2) menu-vmess ;;
+    3) menu-vless ;;
+    4) menu-trojan ;;
+    5) menu-set ;;
+    6) menu-trial ;;
+    7) menu-backup ;;
+    8) add-host ;;
+    9) running ;;
+    10) wsport ;;
+    11) xolpanel ;;
+    12) bw ;;
+    13) menu-theme ;;
+    14) update ;;
+    0) exit 0 ;;
+    x|X) exit 0 ;;
+    *) echo "Wrong choice"; sleep 1; show_menu "$name" "$exp_date" ;;
+  esac
+}
+
+######### Main flow #########
+# require root
+if [ "$(id -u)" -ne 0 ]; then
+  echo -e "${RED}Please run as root${NC}"
+  exit 1
 fi
-echo -e "[ ${green}INFO${NC} ] Starting renew cert... "
-sleep 2
-/root/.acme.sh/acme.sh --set-default-ca --server letsencrypt
-/root/.acme.sh/acme.sh --issue -d $domain --standalone -k ec-256
-~/.acme.sh/acme.sh --installcert -d $domain --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key --ecc
-echo -e "[ ${green}INFO${NC} ] Renew cert done... "
-sleep 2
-echo -e "[ ${green}INFO${NC} ] Starting service $Cek "
-sleep 2
-echo $domain > /etc/xray/domain
-systemctl restart xray
-systemctl restart nginx
-echo -e "[ ${green}INFO${NC} ] All finished... "
-sleep 0.5
-echo ""
-read -n 1 -s -r -p "Press any key to back on menu"
-menu
-}
-export sem=$( curl -s https://raw.githubusercontent.com/FasterExE/VIP-Autoscript/main/versions)
-export pak=$( cat /home/.ver)
-IPVPS=$(curl -s ipinfo.io/ip )
-clear
-echo -e "${BICyan} ┌─────────────────────────────────────────────────────┐${NC}"
-echo -e "${BICyan} │                  ${BIWhite}${UWhite}ILYASS SCRIPT${NC}"
-echo -e "${BICyan} │"
-echo -e "${BICyan} │  ${BICyan}OS         :  ${BIYellow}$( cat /etc/os-release | grep -w PRETTY_NAME | sed 's/PRETTY_NAME//g' | sed 's/=//g' | sed 's/"//g' ) ( $( uname -m) )${NC}"
-echo -e "${BICyan} │  ${BICyan}CPU        :  ${BIYellow}$cpu_usage${NC}"
-echo -e "${BICyan} │  ${BICyan}DOMAIN     :  ${BIYellow}$(cat /etc/xray/domain)${NC}"
-echo -e "${BICyan} │  ${BICyan}CLOUDFLARE :  ${BIYellow}$(cat /etc/xray/flare-domain)${NC}"
-echo -e "${BICyan} │  ${BICyan}NS         :  ${BIYellow}$(cat /root/nsdomain)${NC}"
-echo -e "${BICyan} │  ${BICyan}RAM        :  ${BIYellow}$totalram MB${NC}"
-echo -e "${BICyan} │  ${BICyan}SWAP RAM   :  ${BIYellow}$uram / $tram MB${NC}"
-echo -e "${BICyan} │  ${BICyan}IP VPS     :  ${BIPurple}$IPVPS${NC}"
-echo -e "${BICyan} │  ${BICyan}REBOOT     :  ${BIYellow}02:00 ( It's 2 p.m )${NC}"
-echo -e "${BICyan} │  ${BICyan}DEVELOPER  :  ${BIYellow}𓆩 𝐈𝐋𝐘𝐀𝐒𝐒 𓆪${NC}"
-echo -e "${BICyan} └─────────────────────────────────────────────────────┘${NC}"
-echo -e "${BICyan} ┌─────────────────────────────────────────────────────┐${NC}"
-echo -e "${BICyan} │  ${BIYellow}SSH         VMESS           VLESS          TROJAN $NC"
-echo -e "${BICyan} │  ${Blue} $ssh1            $vma               $vla               $tra $NC"
-echo -e "${BICyan} └─────────────────────────────────────────────────────┘${NC}"
-echo -e "     ${BICyan} SSH ${NC}: $ressh"" ${BICyan} NGINX ${NC}: $resngx"" ${BICyan}  XRAY ${NC}: $resv2r"" ${BICyan} TROJAN ${NC}: $resv2r"
-echo -e "   ${BICyan}     STUNNEL ${NC}: $resst" "${BICyan} DROPBEAR ${NC}: $resdbr" "${BICyan} SSH-WS ${NC}: $ressshws"
-echo -e "${BICyan} ┌─────────────────────────────────────────────────────┐${NC}"
-echo -e "${BICyan} │  ${BICyan}[${BIWhite}01${BICyan}] SSH     ${BICyan}[${BIYellow}Menu${BICyan}]${NC}"  "${BICyan}  [${BIWhite}08${BICyan}] ADD-HOST        ${BICyan}[${BIYellow}Menu${BICyan}]${NC}" "${BICyan} │${NC}"
-echo -e "${BICyan} │  ${BICyan}[${BIWhite}02${BICyan}] VMESS   ${BICyan}[${BIYellow}Menu${BICyan}]${NC}"  "${BICyan}  [${BIWhite}09${BICyan}] RUNNING         ${BICyan}[${BIYellow}Menu${BICyan}]${NC}" "${BICyan} │${NC}"
-echo -e "${BICyan} │  ${BICyan}[${BIWhite}03${BICyan}] VLESS   ${BICyan}[${BIYellow}Menu${BICyan}]${NC}"  "${BICyan}  [${BIWhite}10${BICyan}] WS PORT ${BIPurple}($(cat /etc/ws/status))${NC}  ${BICyan}[${BIYellow}Menu${BICyan}]${NC}" "${BICyan} │${NC}"
-echo -e "${BICyan} │  ${BICyan}[${BIWhite}04${BICyan}] TROJAN  ${BICyan}[${BIYellow}Menu${BICyan}]${NC}"  "${BICyan}  [${BIWhite}11${BICyan}] INSTALL BOT     ${BICyan}[${BIYellow}Menu${BICyan}]${NC}" "${BICyan} │${NC}"
-echo -e "${BICyan} │  ${BICyan}[${BIWhite}05${BICyan}] SETING  ${BICyan}[${BIYellow}Menu${BICyan}]${NC}"  "${BICyan}  [${BIWhite}12${BICyan}] BANDWITH        ${BICyan}[${BIYellow}Menu${BICyan}]${NC}" "${BICyan} │${NC}"
-echo -e "${BICyan} │  ${BICyan}[${BIWhite}06${BICyan}] TRIALL  ${BICyan}[${BIYellow}Menu${BICyan}]${NC}"  "${BICyan}  [${BIWhite}13${BICyan}] MENU THEME      ${BICyan}[${BIYellow}Menu${BICyan}]${NC}" "${BICyan} │${NC}"
-echo -e "${BICyan} │  ${BICyan}[${BIWhite}07${BICyan}] BACKUP  ${BICyan}[${BIYellow}Menu${BICyan}]${NC}"  "${BICyan}  [${BIWhite}14${BICyan}] UPDATE SCRIPT   ${BICyan}[${BIYellow}Menu${BICyan}]${NC}" "${BICyan} │${NC}"
-echo -e "${BICyan} └─────────────────────────────────────────────────────┘${NC}"
-DATE=$(date +'%d %B %Y')
-datediff() {
-d1=$(date -d "$1" +%s)
-d2=$(date -d "$2" +%s)
-echo -e "        ${BICyan}│$NC Expiry In     : $(( (d1 - d2) / 86400 )) Days $NC"
-}
-mai="datediff "$Exp" "$DATE""
-echo -e "        ${BICyan}┌─────────────────────────────────────┐${NC}"
-echo -e "        ${BICyan}│$NC Version       : $(cat /opt/.ver) Last Update ${NC}"
-echo -e "        ${BICyan}│$NC ${GREEN}User          :\033[1;36m $Name \e[0m"
-if [ $exp \< 1000 ];
-then
-echo -e "          $BICyan│$NC License      : ${GREEN}$sisa_hari$NC Days $NC"
+
+log "Starting menu.sh"
+
+# fetch register
+regfile=$(fetch_register) || { log "Failed fetching register"; permission_denied; }
+
+# check permission
+perm_out=""
+if perm_out=$(check_permission "$regfile"); then
+  # perm_out format: name|exp|OK_*
+  IFS='|' read -r NAME EXP STATUS <<< "$perm_out"
+  log "Permission OK for $NAME, expiry $EXP (status $STATUS)"
+  show_menu "$NAME" "$EXP"
 else
-datediff "$Exp" "$DATE"
-fi;
-echo -e "        ${BICyan}└─────────────────────────────────────┘${NC}"
-echo
-read -p " Select menu : " opt
-echo -e ""
-case $opt in
-1) clear ; menu-ssh ;;
-2) clear ; menu-vmess ;;
-3) clear ; menu-vless ;;
-4) clear ; menu-trojan ;;
-5) clear ; menu-set ;;
-6) clear ; menu-trial ;;
-7) clear ; menu-backup ;;
-8) clear ; add-host ;;
-9) clear ; running ;;
-10) clear ; wsport ;;
-11) clear ; xolpanel ;;
-12) clear ; bw ;;
-13) clear ; menu-theme ;;
-14) clear ; update ;;
-0) clear ; menu ;;
-x) exit ;;
-*) echo -e "" ; echo "Press any key to back exit" ; sleep 1 ; exit ;;
-esac
+  code=$?
+  case $code in
+    2) log "License expired"; echo -e "${RED}License expired${NC}"; exit 1 ;;
+    3) log "Token mismatch"; echo -e "${RED}Token required or mismatch${NC}"; exit 1 ;;
+    4) log "No permission for this IP"; permission_denied ;;
+    *) log "Unknown permission error ($code)"; permission_denied ;;
+  esac
+fi
