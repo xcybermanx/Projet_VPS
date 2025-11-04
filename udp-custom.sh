@@ -5,7 +5,7 @@ rm -rf /root/udp &>/dev/null
 mkdir -p /root/udp &>/dev/null
 wget https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/udp-custom-linux-amd64 -O /root/udp/udp-custom &>/dev/null
 chmod +x /root/udp/udp-custom &>/dev/null
-wget https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/config.json -O /root/udp/config.json &>/dev/null
+wget https://raw.githubusercontent.com/xcybermanx/Projet_VPS/refs/heads/main/config.json -O /root/udp/config.json &>/dev/null
 chmod 64 /root/udp/config.json &>/dev/null
 
 if [ -z "$1" ]; then
