@@ -245,7 +245,6 @@ else
 clear
 fi
 secs_to_human() {
-echo -e "${BIGreen}--->${NC}  ${BIYellow}★ ${NC}${BICyan}Installation time : $(( ${1} / 3600 )) hours $(( (${1} / 60) % 60 )) minute's $(( ${1} % 60 )) seconds${NC}${BIYellow} ★ ${NC}"
 sleep 2
 }
 secs_to_human
