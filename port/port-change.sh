@@ -25,5 +25,5 @@ case $opt in
 3) clear ; port-tr ; exit ;;
 0) clear ; menu ; exit ;;
 x) exit ;;
-*) echo -e "" ; echo "Anda Salah tekan ." ; sleep 1 ; port-change ;;
+*) echo -e "" ; echo "You pressed the wrong button ." ; sleep 1 ; port-change ;;
 esac
