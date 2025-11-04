@@ -16,12 +16,6 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1 >/dev/null 2>&1
 sysctl -w net.ipv6.conf.default.disable_ipv6=1 >/dev/null 2>&1
 
 # ------------------------------
-# Prepare directories
-# ------------------------------
-mkdir -p /etc/gxtunnel /etc/domain /etc/xray /etc/v2ray /home/script
-touch /etc/domain/cf-domain /etc/xray/domain /etc/v2ray/domain /etc/xray/scdomain /etc/v2ray/scdomain
-
-# ------------------------------
 # Root check & virtualization check
 # ------------------------------
 if [ "${EUID}" -ne 0 ]; then
@@ -35,31 +29,30 @@ if [ "$(systemd-detect-virt)" == "openvz" ]; then
 fi
 
 # ------------------------------
-# Hostname setup
+# Variables
 # ------------------------------
-localip=$(hostname -I | cut -d\  -f1)
-hst=$(hostname)
-dart=$(awk '{print $2}' /etc/hosts | grep -w "$hst")
-if [[ "$hst" != "$dart" ]]; then
-    echo "$localip $hst" >> /etc/hosts
-fi
+Username="gxtunnel"
+USER_HOME="/home/$Username"
+CDN="https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/ssh"
+TIME=10
+CHATID="chat_id_here"
+URL="telegram_url_here"
 
 # ------------------------------
-# Kernel headers check
+# Create user and directories
 # ------------------------------
-totet=$(uname -r)
-REQUIRED_PKG="linux-headers-$totet"
-PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG 2>/dev/null | grep "install ok installed")
-if [ "" = "$PKG_OK" ]; then
-    echo "[WARNING] Installing $REQUIRED_PKG..."
-    apt-get update -y
-    apt-get --yes install $REQUIRED_PKG
-fi
+userdel $Username >/dev/null 2>&1
+useradd -r -d $USER_HOME -s /bin/bash -M $Username >/dev/null 2>&1
+echo -e "gxtunnel123\ngxtunnel123\n" | passwd $Username >/dev/null 2>&1
+usermod -aG sudo $Username >/dev/null 2>&1
+
+mkdir -p $USER_HOME/tmp $USER_HOME/config $USER_HOME/xray $USER_HOME/v2ray $USER_HOME/domain
+chown -R $Username:$Username $USER_HOME
 
 # ------------------------------
 # Profile setup
 # ------------------------------
-cat > /root/.profile << 'END'
+cat > $USER_HOME/.profile << 'END'
 if [ "$BASH" ]; then
     if [ -f ~/.bashrc ]; then
         . ~/.bashrc
@@ -68,7 +61,8 @@ fi
 mesg n || true
 clear
 END
-chmod 644 /root/.profile
+chown $Username:$Username $USER_HOME/.profile
+chmod 644 $USER_HOME/.profile
 
 # ------------------------------
 # Domain setup
@@ -82,19 +76,20 @@ if [ "$dns" -eq 1 ]; then
     read -rp "Enter Your Cloudflare Domain: " FLARE_DOMAIN
     read -rp "Enter Your NS Domain: " NS_DOMAIN
 
-    echo $FLARE_DOMAIN >> /root/xray/flare-domain
-    echo $NS_DOMAIN >> /root/nsdomain
-    echo $WS_DOMAIN >> /root/domain
+    echo $FLARE_DOMAIN >> $USER_HOME/xray/flare-domain
+    echo $NS_DOMAIN >> $USER_HOME/config/nsdomain
+    echo $WS_DOMAIN >> $USER_HOME/domain/domain
     echo $FLARE_DOMAIN >> /etc/xray/flare-domain
     echo $WS_DOMAIN >> /etc/xray/domain
-    echo $WS_DOMAIN >> /root/scdomain
-    echo $WS_DOMAIN >> /root/xray/scdomain
+    echo $WS_DOMAIN >> $USER_HOME/config/scdomain
+    echo $WS_DOMAIN >> $USER_HOME/xray/scdomain
 
 elif [ "$dns" -eq 2 ]; then
     apt install -y jq curl
-    wget -q -O /root/cf "${CDN}/cf" >/dev/null 2>&1
-    chmod +x /root/cf
-    bash /root/cf | tee /root/install.log
+    wget -q -O $USER_HOME/cf "${CDN}/cf" >/dev/null 2>&1
+    chmod +x $USER_HOME/cf
+    chown $Username:$Username $USER_HOME/cf
+    su - $Username -c "$USER_HOME/cf | tee $USER_HOME/install.log"
 fi
 
 # ------------------------------
@@ -106,54 +101,91 @@ register="https://raw.githubusercontent.com/xcybermanx/Projet_VPS/refs/heads/mai
 username=$(curl $register | grep $MYIP | awk '{print $2}')
 exp=$(curl $register | grep $MYIP | awk '{print $3}')
 
-echo "$username" >/usr/bin/user
-echo "$exp" >/usr/bin/e
+echo "$username" > /usr/bin/user
+echo "$exp" > /usr/bin/e
 
 # ------------------------------
-# System user creation
+# Kernel headers check
 # ------------------------------
-userdel jame > /dev/null 2>&1
-Username="gxtunnel"
-Password="gxtunnel123"
-
-useradd -r -d /home/script -s /bin/bash -M $Username > /dev/null 2>&1
-echo -e "$Password\n$Password\n" | passwd $Username > /dev/null 2>&1
-usermod -aG sudo $Username > /dev/null 2>&1
+totet=$(uname -r)
+REQUIRED_PKG="linux-headers-$totet"
+PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG 2>/dev/null | grep "install ok installed")
+if [ "" = "$PKG_OK" ]; then
+    echo "[INFO] Installing $REQUIRED_PKG..."
+    apt-get update -y
+    apt-get --yes install $REQUIRED_PKG
+fi
 
 # ------------------------------
 # Install components
 # ------------------------------
-TIME=10
-CHATID="chat_id_here"
-URL="telegram_url_here"
+green "---> Installing SSH/WS"
+wget -O $USER_HOME/ssh-vpn.sh https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/ssh/ssh-vpn.sh
+chmod +x $USER_HOME/ssh-vpn.sh
+chown $Username:$Username $USER_HOME/ssh-vpn.sh
+su - $Username -c "$USER_HOME/ssh-vpn.sh"
 
-green "---> Install SSH/WS"
-wget https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/ssh/ssh-vpn.sh && chmod +x ssh-vpn.sh && ./ssh-vpn.sh
+green "---> Installing UDP Custom"
+wget -O $USER_HOME/udp-custom.sh https://raw.githubusercontent.com/FasterExE/UDP-Custom/main/udp-custom.sh
+chmod +x $USER_HOME/udp-custom.sh
+chown $Username:$Username $USER_HOME/udp-custom.sh
+su - $Username -c "$USER_HOME/udp-custom.sh"
 
-green "---> Install UDP Custom"
-wget https://raw.githubusercontent.com/FasterExE/UDP-Custom/main/udp-custom.sh && chmod +x udp-custom.sh && ./udp-custom.sh
+green "---> Installing OpenVPN"
+wget -O $USER_HOME/ovpn.sh https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/ssh/ovpn.sh
+chmod +x $USER_HOME/ovpn.sh
+chown $Username:$Username $USER_HOME/ovpn.sh
+su - $Username -c "$USER_HOME/ovpn.sh"
 
-green "---> Install OpenVPN"
-wget https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/ssh/ovpn.sh && chmod +x ovpn.sh && ./ovpn.sh
+green "---> Installing Backup"
+wget -O $USER_HOME/set-br.sh https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/backup/set-br.sh
+chmod +x $USER_HOME/set-br.sh
+chown $Username:$Username $USER_HOME/set-br.sh
+su - $Username -c "$USER_HOME/set-br.sh"
 
-green "---> Install Backup"
-wget https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/backup/set-br.sh && chmod +x set-br.sh && ./set-br.sh
+green "---> Installing XRAY"
+wget -O $USER_HOME/ins-xray.sh https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/xray/ins-xray.sh
+chmod +x $USER_HOME/ins-xray.sh
+chown $Username:$Username $USER_HOME/ins-xray.sh
+su - $Username -c "$USER_HOME/ins-xray.sh"
 
-green "---> Install XRAY"
-wget https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/xray/ins-xray.sh && chmod +x ins-xray.sh && ./ins-xray.sh
-wget https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/sshws/insshws.sh && chmod +x insshws.sh && ./insshws.sh
+wget -O $USER_HOME/insshws.sh https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/sshws/insshws.sh
+chmod +x $USER_HOME/insshws.sh
+chown $Username:$Username $USER_HOME/insshws.sh
+su - $Username -c "$USER_HOME/insshws.sh"
 
-green "---> Install SLOWDNS"
-wget -q -O slow.sh https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/slow.sh && chmod +x slow.sh && ./slow.sh
+green "---> Installing SLOWDNS"
+wget -q -O $USER_HOME/slow.sh https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/slow.sh
+chmod +x $USER_HOME/slow.sh
+chown $Username:$Username $USER_HOME/slow.sh
+su - $Username -c "$USER_HOME/slow.sh"
 
 # ------------------------------
 # Install tools
 # ------------------------------
-wget -q https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/tools.sh && chmod +x tools.sh && ./tools.sh
-rm -f tools.sh
+wget -q -O $USER_HOME/tools.sh https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/tools.sh
+chmod +x $USER_HOME/tools.sh
+chown $Username:$Username $USER_HOME/tools.sh
+su - $Username -c "$USER_HOME/tools.sh"
+rm -f $USER_HOME/tools.sh
 
 # ------------------------------
-# Clean up and reboot
+# Clean up temporary files
 # ------------------------------
-rm -f /root/setup.sh /root/ins-xray.sh /root/insshws.sh
+rm -f $USER_HOME/ssh-vpn.sh $USER_HOME/udp-custom.sh $USER_HOME/ovpn.sh \
+      $USER_HOME/set-br.sh $USER_HOME/ins-xray.sh $USER_HOME/insshws.sh $USER_HOME/slow.sh
+
+# ------------------------------
+# Ensure menu is executable
+# ------------------------------
+if [ -f "$USER_HOME/menu" ]; then
+    chmod +x $USER_HOME/menu
+    chown $Username:$Username $USER_HOME/menu
+fi
+
+# ------------------------------
+# Reboot
+# ------------------------------
+green "Setup complete! Rebooting in 5 seconds..."
+sleep 5
 reboot
