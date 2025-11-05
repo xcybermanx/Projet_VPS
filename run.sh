@@ -1,6 +1,6 @@
 #!/bin/bash
 # --------------------------------------------------
-# Auto Bootstrap Script for Projet_VPS
+# Fully Automated Bootstrap Script for Projet_VPS
 # Usage: curl -sSL https://github.com/xcybermanx/Projet_VPS/raw/main/run.sh | bash
 # --------------------------------------------------
 
@@ -16,8 +16,10 @@ fi
 # Update & install dependencies
 # ------------------------------
 echo "[INFO] Updating system and installing dependencies..."
+DEPS="git wget curl sudo unzip iptables bc screen curl openssl"
+export DEBIAN_FRONTEND=noninteractive
 apt update -y && apt upgrade -y
-apt install -y git wget curl sudo unzip iptables
+apt install -y $DEPS
 
 # ------------------------------
 # Create dedicated user if not exists
@@ -48,12 +50,13 @@ find $REPO_DIR -type f -name "*.sh" -exec chmod +x {} \;
 chown -R $USERNAME:$USERNAME $REPO_DIR
 
 # ------------------------------
-# Run setup.sh as gxtunnel user
+# Run setup.sh unattended
 # ------------------------------
-echo "[INFO] Running setup.sh..."
-sudo -u $USERNAME bash $REPO_DIR/setup.sh
+echo "[INFO] Running setup.sh in fully unattended mode..."
+# Some setup scripts check for input; we feed yes to all prompts
+sudo -u $USERNAME bash -c "yes | bash $REPO_DIR/setup.sh"
 
 # ------------------------------
 # Finished
 # ------------------------------
-echo "[INFO] Installation completed!"
+echo "[INFO] Installation completed! All services should be running."
