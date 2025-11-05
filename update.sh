@@ -9,7 +9,7 @@ exit 1
 fi
 echo ""
 version=$(cat /home/ver)
-ver=$( curl https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/version )
+ver=$( curl https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/version )
 clear
 line=$(cat /etc/line)
 below=$(cat /etc/below)
@@ -21,7 +21,7 @@ Info1="${Green_font_prefix}($version)${Font_color_suffix}"
 Info2="${Green_font_prefix}(OLD VERSION)${Font_color_suffix}"
 Error="Version ${Green_font_prefix}[$ver]${Font_color_suffix} available${Red_font_prefix}[Please Update]${Font_color_suffix}"
 version=$(cat /home/ver)
-new_version=$( curl https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/version | grep $version )
+new_version=$( curl https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/version | grep $version )
 if [ $version = $new_version ]; then
 sts="${Info2}"
 else
@@ -48,7 +48,7 @@ read -p "PPlease Choose 1 or x : " option2
 case $option2 in
 1)
 version=$(cat /home/ver)
-new_version=$( curl https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/version | grep $version )
+new_version=$( curl https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/version | grep $version )
 if [ $version = $new_version ]; then
 clear
 echo ""
@@ -75,7 +75,7 @@ echo -e "\e[0;32mGetting New Version Script..\e[0m"
 sleep 1
 echo ""
 cd /usr/bin
-wget -O run-update "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/update.sh"
+wget -O run-update "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/update.sh"
 chmod +x run-update
 echo ""
 clear
@@ -86,25 +86,25 @@ echo ""
 echo -e "\e[0;32mNew Version Downloading started!\e[0m"
 sleep 2
 cd /usr/bin
-wget -q -O /usr/bin/usernew "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/ssh/usernew.sh"
-wget -q -O /usr/bin/auto-reboot "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/menu/auto-reboot.sh"
-wget -q -O /usr/bin/restart "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/menu/restart.sh"
-wget -q -O /usr/bin/tendang "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/ssh/tendang.sh"
-wget -q -O /usr/bin/clearcache "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/menu/clearcache.sh"
-wget -q -O /usr/bin/running "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/menu/running.sh"
-wget -q -O /usr/bin/speedtest "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/ssh/speedtest_cli.py"
-wget -q -O /usr/bin/menu-vless "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/menu/menu-vless.sh"
-wget -q -O /usr/bin/menu-vmess "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/menu/menu-vmess.sh"
-wget -q -O /usr/bin/menu-trojan "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/menu/menu-trojan.sh"
-wget -q -O /usr/bin/menu-ssh "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/menu/menu-ssh.sh"
-wget -q -O /usr/bin/menu-backup "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/menu/menu-backup.sh"
-wget -q -O /usr/bin/menu "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/menu/menu.sh"
-wget -q -O /usr/bin/menu1 "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/theme/menu1.sh"
-wget -q -O /usr/bin/menu2 "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/theme/menu2.sh"
-wget -q -O /usr/bin/menu3 "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/theme/menu3.sh"
-wget -q -O /usr/bin/menu4 "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/theme/menu4.sh"
-wget -q -O /usr/bin/menu5 "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/theme/menu5.sh"
-wget -q -O /usr/bin/menu-webmin "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/menu/menu-webmin.sh"
+wget -q -O /usr/bin/usernew "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/ssh/usernew.sh"
+wget -q -O /usr/bin/auto-reboot "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/menu/auto-reboot.sh"
+wget -q -O /usr/bin/restart "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/menu/restart.sh"
+wget -q -O /usr/bin/tendang "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/ssh/tendang.sh"
+wget -q -O /usr/bin/clearcache "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/menu/clearcache.sh"
+wget -q -O /usr/bin/running "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/menu/running.sh"
+wget -q -O /usr/bin/speedtest "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/ssh/speedtest_cli.py"
+wget -q -O /usr/bin/menu-vless "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/menu/menu-vless.sh"
+wget -q -O /usr/bin/menu-vmess "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/menu/menu-vmess.sh"
+wget -q -O /usr/bin/menu-trojan "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/menu/menu-trojan.sh"
+wget -q -O /usr/bin/menu-ssh "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/menu/menu-ssh.sh"
+wget -q -O /usr/bin/menu-backup "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/menu/menu-backup.sh"
+wget -q -O /usr/bin/menu "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/menu/menu.sh"
+wget -q -O /usr/bin/menu1 "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/theme/menu1.sh"
+wget -q -O /usr/bin/menu2 "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/theme/menu2.sh"
+wget -q -O /usr/bin/menu3 "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/theme/menu3.sh"
+wget -q -O /usr/bin/menu4 "https://raw.githubusercontent.comxcybermanx/Projet_VPS/main/theme/menu4.sh"
+wget -q -O /usr/bin/menu5 "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/theme/menu5.sh"
+wget -q -O /usr/bin/menu-webmin "https://raw.githubusercontent.com/xcybermanx/Projet_VPS/main/menu/menu-webmin.sh"
 wget -q -O /usr/bin/xp "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/ssh/xp.sh"
 wget -q -O /usr/bin/update "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/update.sh"
 wget -q -O /usr/bin/add-host "https://raw.githubusercontent.com/zoolztheaz/autoscript-vvip/main/ssh/add-host.sh"
