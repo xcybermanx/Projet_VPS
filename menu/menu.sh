@@ -221,7 +221,7 @@ export pak=$( cat /home/.ver)
 IPVPS=$(curl -s ipinfo.io/ip )
 clear
 echo -e "${BICyan} ┌─────────────────────────────────────────────────────┐${NC}"
-echo -e "${BICyan} │                  ${BIWhite}${UWhite}ILYASS SCRIPT${NC}"
+echo -e "${BICyan} │                  ${BIWhite}${UWhite}Gxtunnel SCRIPT${NC}"
 echo -e "${BICyan} │"
 echo -e "${BICyan} │  ${BICyan}OS         :  ${BIYellow}$( cat /etc/os-release | grep -w PRETTY_NAME | sed 's/PRETTY_NAME//g' | sed 's/=//g' | sed 's/"//g' ) ( $( uname -m) )${NC}"
 echo -e "${BICyan} │  ${BICyan}CPU        :  ${BIYellow}$cpu_usage${NC}"
@@ -232,7 +232,7 @@ echo -e "${BICyan} │  ${BICyan}RAM        :  ${BIYellow}$totalram MB${NC}"
 echo -e "${BICyan} │  ${BICyan}SWAP RAM   :  ${BIYellow}$uram / $tram MB${NC}"
 echo -e "${BICyan} │  ${BICyan}IP VPS     :  ${BIPurple}$IPVPS${NC}"
 echo -e "${BICyan} │  ${BICyan}REBOOT     :  ${BIYellow}02:00 ( It's 2 p.m )${NC}"
-echo -e "${BICyan} │  ${BICyan}DEVELOPER  :  ${BIYellow}𓆩 𝐈𝐋𝐘𝐀𝐒𝐒 𓆪${NC}"
+echo -e "${BICyan} │  ${BICyan}DEVELOPER  :  ${BIYellow}𓆩 Gxtunnel 𓆪${NC}"
 echo -e "${BICyan} └─────────────────────────────────────────────────────┘${NC}"
 echo -e "${BICyan} ┌─────────────────────────────────────────────────────┐${NC}"
 echo -e "${BICyan} │  ${BIYellow}SSH         VMESS           VLESS          TROJAN $NC"
