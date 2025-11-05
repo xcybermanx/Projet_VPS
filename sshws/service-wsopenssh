@@ -1,6 +1,5 @@
 [Unit]
-Description=Websocket OpenSSH Ilyass
-Documentation=https://t.me/IlyassExE
+Description=Websocket OpenSSH
 After=network.target nss-lookup.target
 
 [Service]
