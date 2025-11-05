@@ -1,62 +1,64 @@
 #!/bin/bash
-# --------------------------------------------------
-# Fully Automated Bootstrap Script for Projet_VPS
-# Usage: curl -sSL https://github.com/xcybermanx/Projet_VPS/raw/main/run.sh | bash
-# --------------------------------------------------
+# ===============================
+# Auto installer for Projet_VPS
+# ===============================
+
+# Variables
+USERNAME="gxtunnel"
+REPO_URL="https://github.com/xcybermanx/Projet_VPS"
+REPO_DIR="/home/$USERNAME/Projet_VPS"
+LOG_FILE="/root/projet_vps_install.log"
 
 # ------------------------------
-# Check for root
+# Ensure script is run as root
 # ------------------------------
-if [ "$EUID" -ne 0 ]; then
-    echo "Please run as root"
+if [[ $EUID -ne 0 ]]; then
+    echo "❌ This script must be run as root."
     exit 1
 fi
 
 # ------------------------------
-# Update & install dependencies
+# Update & install prerequisites
 # ------------------------------
-echo "[INFO] Updating system and installing dependencies..."
-DEPS="git wget curl sudo unzip iptables bc screen curl openssl"
-export DEBIAN_FRONTEND=noninteractive
-apt update -y && apt upgrade -y
-apt install -y $DEPS
+echo "[INFO] Updating packages and installing prerequisites..." | tee -a $LOG_FILE
+apt update -y && apt upgrade -y | tee -a $LOG_FILE
+apt install -y sudo git unzip curl wget lsof vim tmux | tee -a $LOG_FILE
 
 # ------------------------------
-# Create dedicated user if not exists
+# Create user if not exists
 # ------------------------------
-USERNAME="gxtunnel"
 if ! id -u $USERNAME >/dev/null 2>&1; then
-    echo "[INFO] Creating user $USERNAME..."
-    adduser --disabled-password --gecos "" $USERNAME
+    echo "[INFO] Creating user $USERNAME..." | tee -a $LOG_FILE
+    adduser --disabled-password --gecos "" $USERNAME | tee -a $LOG_FILE
     usermod -aG sudo $USERNAME
 fi
 
 # ------------------------------
-# Clone repo if not present
+# Clone the repository
 # ------------------------------
-USER_HOME="/home/$USERNAME"
-REPO_DIR="$USER_HOME/Projet_VPS"
-
+echo "[INFO] Cloning Projet_VPS repository..." | tee -a $LOG_FILE
 if [ ! -d "$REPO_DIR" ]; then
-    echo "[INFO] Cloning Projet_VPS repository..."
-    sudo -u $USERNAME git clone https://github.com/xcybermanx/Projet_VPS.git $REPO_DIR
+    git clone $REPO_URL $REPO_DIR | tee -a $LOG_FILE
+else
+    echo "[INFO] Repository already exists, pulling latest changes..." | tee -a $LOG_FILE
+    cd $REPO_DIR
+    git pull | tee -a $LOG_FILE
 fi
 
 # ------------------------------
-# Set permissions for scripts
+# Set execute permissions
 # ------------------------------
-echo "[INFO] Setting execute permissions..."
-find $REPO_DIR -type f -name "*.sh" -exec chmod +x {} \;
-chown -R $USERNAME:$USERNAME $REPO_DIR
+echo "[INFO] Setting execute permissions..." | tee -a $LOG_FILE
+chmod -R +x $REPO_DIR/*.sh
 
 # ------------------------------
 # Run setup.sh unattended
 # ------------------------------
-echo "[INFO] Running setup.sh in fully unattended mode..."
-# Some setup scripts check for input; we feed yes to all prompts
-sudo -u $USERNAME bash -c "yes | bash $REPO_DIR/setup.sh"
+echo "[INFO] Running setup.sh in fully unattended mode..." | tee -a $LOG_FILE
+yes | bash $REPO_DIR/setup.sh 2>&1 | tee -a $LOG_FILE
 
 # ------------------------------
-# Finished
+# Final message
 # ------------------------------
-echo "[INFO] Installation completed! All services should be running."
+echo "[INFO] Installation completed! Check $LOG_FILE for details." | tee -a $LOG_FILE
+echo "[INFO] All services should be running."
